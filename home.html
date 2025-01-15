@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuit Resistance Calculator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom right, #0d1b2a, #1b263b);
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+        }
+
+        label, select, input, button {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 1em;
+            color: #ffffff;
+        }
+
+        select, input {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #1b263b;
+            color: #ffffff;
+            font-size: 1em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            padding: 10px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 8px;
+            background: #ffcc00;
+            color: #1b263b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background: #e6b800;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #ffcc00;
+        }
+
+        .home-button {
+            margin-top: 15px;
+            text-decoration: none;
+            font-size: 1em;
+            color: #1b263b;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .home-button:hover {
+            background: #f0f0f0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            button {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">Circuit Resistance Calculator</h1>
+        <div id="step1">
+            <label for="language">Choose Language / اختر اللغة:</label>
+            <select id="language">
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+            </select>
+
+            <label for="circuitType" id="circuitTypeLabel">Select Circuit Type / اختر نوع الدائرة:</label>
+            <select id="circuitType">
+                <option value="series">Series / دائرة على التوالي</option>
+                <option value="parallel">Parallel / دائرة على التوازي</option>
+            </select>
+
+            <button onclick="proceedToStep2()">Next / التالي</button>
+        </div>
+
+        <div id="step2" style="display: none;">
+            <label for="numResistors" id="numResistorsLabel">Enter Number of Resistors / أدخل عدد المقاومات:</label>
+            <input type="number" id="numResistors" min="1" placeholder="e.g., 3">
+            <button onclick="proceedToStep3()">Next / التالي</button>
+        </div>
+
+        <div id="step3" style="display: none;">
+            <div id="resistorInputs"></div>
+            <button onclick="calculateResistance()">Calculate / احسب</button>
+        </div>
+
+        <div id="result" class="result"></div>
+        <a href="home.html" class="home-button" style="display: none;" id="homeButton">Home / الصفحة الرئيسية</a>
+    </div>
+
+    <script>
+        let language = 'en';
+
+        document.getElementById('language').addEventListener('change', function () {
+            language = this.value;
+            updateText();
+        });
+
+        function updateText() {
+            const text = {
+                en: {
+                    title: "Circuit Resistance Calculator",
+                    circuitTypeLabel: "Select Circuit Type:",
+                    numResistorsLabel: "Enter Number of Resistors:",
+                    buttonNext: "Next",
+                    resultLabel: "Total Resistance:",
+                    lawLabel: "Law Used:",
+                    lawSeries: "R_total = R₁ + R₂ + R₃ + ...",
+                    lawParallel: "1/R_total = 1/R₁ + 1/R₂ + 1/R₃ + ...",
+                },
+                ar: {
+                    title: "حاسبة مقاومة الدوائر",
+                    circuitTypeLabel: "اختر نوع الدائرة:",
+                    numResistorsLabel: "أدخل عدد المقاومات:",
+                    buttonNext: "التالي",
+                    resultLabel: "المقاومة الكلية:",
+                    lawLabel: "القانون المستخدم:",
+                    lawSeries: "R الكلية = R₁ + R₂ + R₃ + ...",
+                    lawParallel: "1/R الكلية = 1/R₁ + 1/R₂ + 1/R₃ + ...",
+                },
+            };
+            const t = text[language];
+            document.getElementById('title').innerText = t.title;
+            document.getElementById('circuitTypeLabel').innerText = t.circuitTypeLabel;
+            document.getElementById('numResistorsLabel').innerText = t.numResistorsLabel;
+        }
+
+        function proceedToStep2() {
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }
+
+        function proceedToStep3() {
+            const num = parseInt(document.getElementById('numResistors').value);
+            if (isNaN(num) || num <= 0) {
+                alert(language === 'ar' ? "الرجاء إدخال رقم صحيح." : "Please enter a valid number.");
+                return;
+            }
+
+            const container = document.getElementById('resistorInputs');
+            container.innerHTML = '';
+            for (let i = 0; i < num; i++) {
+                const label = document.createElement('label');
+                label.innerText = language === 'ar' ? `أدخل قيمة المقاومة ${i + 1}:` : `Enter value of resistor ${i + 1}:`;
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.placeholder = 'e.g., 10';
+                input.id = `resistor${i}`;
+                container.appendChild(label);
+                container.appendChild(input);
+            }
+
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'block';
+        }
+
+        function calculateResistance() {
+            const type = document.getElementById('circuitType').value;
+            const inputs = document.querySelectorAll('#resistorInputs input');
+            const resistances = Array.from(inputs).map(input => parseFloat(input.value));
+            if (resistances.some(isNaN)) {
+                alert(language === 'ar' ? "الرجاء إدخال قيم صالحة لجميع المقاومات." : "Please enter valid values for all resistors.");
+                return;
+            }
+
+            let total, law;
+            if (type === 'series') {
+                total = resistances.reduce((a, b) => a + b, 0);
+                law = language === 'ar' ? "R الكلية = R₁ + R₂ + R₃ + ..." : "R_total = R₁ + R₂ + R₃ + ...";
+            } else {
+                total = 1 / resistances.reduce((a, b) => a + 1 / b, 0);
+                law = language === 'ar' ? "1/R الكلية = 1/R₁ + 1/R₂ + 1/R₃ + ..." : "1/R_total = 1/R₁ + 1/R₂ + 1/R₃ + ...";
+            }
+
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                ${language === 'ar' ? "المقاومة الكلية:" : "Total Resistance:"} ${total.toFixed(2)} Ω<br>
+                ${language === 'ar' ? "القانون المستخدم:" : "Law Used:"} ${law}
+            `;
+            document.getElementById('step3').style.display = 'none';
+            document.getElementById('homeButton').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
